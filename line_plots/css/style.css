@@ -12,3 +12,20 @@
     top: 10px;
     left: 0;
 }
+
+.stave{
+    stroke: #000;
+    stroke-width: 1px;
+    opacity:0.5
+}
+.note{
+    stroke: #000;
+    stroke-width: 0.25px;
+    opacity: 0.50;
+}
+.flagpole{
+    stroke: #000;
+    stroke-width: 0.50px;
+    opacity:0.5
+
+}

@@ -3,9 +3,10 @@
 function Circles(){
   var width =960
     , height = 600
+    , clickArray = []
     , id = "tax-circle"
-    , circle_radius = 2
-    , circle_radius_max = 5;
+    , circle_radius = 4
+    , circle_radius_max = 7;
   function chart(selection){
     // the chart function builds the heatmap.
     // note: selection is passed in from the .call(myHeatmap), which is the same as myHeatmap(d3.select('.stuff')) -- ??
@@ -83,7 +84,8 @@ function Circles(){
       var stave_yValues = {};
 
       // draw staves
-      var staves = musicScore.append("g")
+      var staves = musicScore
+        .append("g")
         .attr("id","staves-container")
         .selectAll(".stave")
         .data(regions)
@@ -97,23 +99,13 @@ function Circles(){
           return "M 0,"+  (stave_yValues[d])+"L"+ stave_length +","+(stave_yValues[d]);
         });
 
-      // buld notes
-      var notes = musicScore.append("g")
-        .attr("id","notes-container")
-        .selectAll(".note")
-        .data(state_array)
-       .enter().append("circle")
-        .attr("id",d => "note-"+d.STATE + d.STATEFIPS)
-        .attr("class",d => d.STATE)
-        .classed("note",true)
-        .attr("r",circle_radius)
-        .attr("cy",d => stave_yValues[d.region_name])
-        .attr("cx",d => notes_xScale( (d.aTaxLiability/d.nTaxLiability) ))
-        .style("fill",d => district_color(d.district_name));
+      var note_stem_container = musicScore.append("g").attr("id","note-stem-container")
 
       // build stems
-      var stems = musicScore.append("g")
-        .attr("id","stem-container")
+      var stems = note_stem_container
+        //musicScore
+        //.append("g")
+        //.attr("id","stem-container")
         .selectAll(".stem")
         .data(state_array)
        .enter().append("path")
@@ -127,6 +119,30 @@ function Circles(){
           var linePath = "M "+ x + "," + y1 + "L" + x + "," + y2
           return linePath;
         });
+
+      // build notes
+      var notes = note_stem_container
+        //musicScore
+        //.append("g")
+        //.attr("id","notes-container")
+        .selectAll(".note")
+        .data(state_array)
+       .enter().append("circle")
+        .attr("id",d => "note-"+d.STATE + d.STATEFIPS)
+        .attr("class",d => d.STATE)
+        .classed("note",true)
+        .attr("r",circle_radius)
+        .attr("cy",d => stave_yValues[d.region_name])
+        .attr("cx",d => notes_xScale( (d.aTaxLiability/d.nTaxLiability) ))
+        .style("fill",d => district_color(d.district_name));
+
+      // put the stems and notes in order on the svg
+      state_array.map(function(d,i){
+        var key = d.STATE + d.STATEFIPS;
+        d3.select("#stem-"+key).raise()
+        d3.select("#note-"+key).raise()
+      })
+
         //.style("fill",d => district_color(d.district_name));
 
       // build voronoi
@@ -136,8 +152,9 @@ function Circles(){
         .extent([[-20,-40],[stave_length+20 , (stave_spacing * regions.length)]]);
 
       // draw voronoi polygons
-      var voronoi_polygons = musicScore.append("g")
-        .attr("id","voronoi-container")
+      var voronoi_polygons = musicScore
+        //.append("g")
+        //.attr("id","voronoi-container")
         .selectAll(".voronoi")
         .data(voronoi.polygons(state_array))
        .enter().append("path")
@@ -146,17 +163,152 @@ function Circles(){
 
       // mouseover
       voronoi_polygons.on('mouseover',function(d,i){
+        // increase note radious
         d3.select("#note-"+d.data.STATE + d.data.STATEFIPS)
+          .raise()
           .attr("r",circle_radius_max);
+        // move and fill stem
         d3.select("#stem-"+d.data.STATE + d.data.STATEFIPS)
+          .raise()
+          .style("opacity",1)
+          .style("stroke-width","2px")
           .attr("transform","translate("+(circle_radius_max-circle_radius)+",0)");
       })
       // mouseout
       voronoi_polygons.on('mouseout',function(d,i){
+        // decrease note radious
         d3.select("#note-"+d.data.STATE + d.data.STATEFIPS)
+          .raise()
           .attr("r",circle_radius);
+        // decrease note radious
         d3.select("#stem-"+d.data.STATE + d.data.STATEFIPS)
+          .raise()
+          .style("opacity",0.50)
+          .style("stroke-width","0.50px")
           .attr("transform","translate(0,0)");
+        // raise arc to always be on top
+        d3.select(".arc").raise()
+      })
+      // click
+      voronoi_polygons.on('click',function(d,i){
+        var key = d.data.STATE + d.data.STATEFIPS
+        , keyLocation = clickArray.indexOf(key)
+        , keyInClickArray = (keyLocation > -1)
+
+        // add key
+        add(key)
+        // if repeated key, remove all instance of key
+        if (keyInClickArray){
+          clear(key)
+        }
+        // if newly selected comparison, remove second item
+        if (clickArray.length==3){
+          clear(clickArray[1])
+        }
+        // if two items remain, make comparison
+        if (clickArray.length==2){
+          comp()
+        }else{
+          removeArc()
+          removeText()
+        }
+        function clear(k){
+          clickArray = clickArray.filter(d => d!=k)
+          //console.log(clickArray)
+          removeFlag(k)
+          removeArc(k)
+        }
+        function add(k){
+          clickArray.push(k)
+          //console.log(clickArray)
+          addFlag(k)
+        }
+        function addFlag(k){
+          console.log("test: addFlag")
+          console.log(d.data)
+          , x1 = (notes_xScale((d.data.aTaxLiability/d.data.nTaxLiability)) +circle_radius)
+          , x2 = x1+10
+          , y1 = stave_yValues[d.data.region_name]
+          , y2 = y1 - energyCredits_yScale(d.data.nEnergyCredits/d.data.returns)
+          , y3 = y2+5;
+
+          var flag = note_stem_container.append("path")
+              .attr("id","flag-"+k)
+              .classed("flag",true)
+              .attr("d","M"+x1+","+y2+"L"+x2+","+y3);
+
+        }
+        function removeFlag(k){
+          console.log("test: removeFlag")
+          var flag = note_stem_container.selectAll("#flag-"+k).remove();
+        }
+        function comp(){
+          var linePoints = []
+          var compValues = {}
+          // iterate through clickArray
+          clickArray.map(function(k,i){
+            // remove flags
+            //removeFlag(k)
+            // get coordiinates for line
+            d3.select("#stem-"+k).each(function(d){
+              var x1 = (notes_xScale((d.aTaxLiability/d.nTaxLiability)) +circle_radius)
+                , y1 = stave_yValues[d.region_name]
+                , y2 = y1 - energyCredits_yScale(d.nEnergyCredits/d.returns)
+              linePoints.push([x1,y2])
+              compValues[k] = d
+            })
+          })
+          drawArc(linePoints)
+          addText(compValues)
+        }
+        function drawArc(coords){
+          // draw arc
+          note_stem_container.selectAll(".arc")
+            .data([coords])
+           .enter().append("path")
+            .classed("arc",true)
+            .attr("d",function(d){
+              var x1 = d[0][0]
+                , y1 = d[0][1]
+                , x2 = d[1][0]
+                , y2 = d[1][1];
+              return "M"+x1+","+y1+"L"+x2+","+y2;
+            })
+        }
+        function removeArc(){
+          d3.selectAll(".arc").remove()
+        }
+        function addText(compValues){
+          removeText()
+          console.log(compValues)
+          var state1 = clickArray[0]
+            , state2 = clickArray[1];
+
+          var insight1 = compValues[state1].STATE +" saved $"+compValues[state1].aEnergyCredits +" from energy credits compared to "+ compValues[state2].STATE +"'s $"+compValues[state2].aEnergyCredits+" savings";
+          console.log(insight1);
+          musicScore.append("g")
+            .classed("insights",true)
+            .append("text")
+            .attr("x",0)
+            .attr("y",140)
+            .style("fill","black")
+            .style("stroke","black")
+            .style("font-size","12")
+            .style("opacity",0.70)
+            .text(insight1)
+
+        }
+        function removeText(){
+          musicScore.select(".insights").remove()
+          console.log("test: removeText")
+        }
+
+        // decrease note radious
+        //d3.select("#note-"+d.data.STATE + d.data.STATEFIPS)
+        //  .each(d => console.log(d))
+        // decrease note radious
+        //d3.select("#stem-"+d.data.STATE + d.data.STATEFIPS)
+        //  .each(d => console.log(d))
       })
 
     })

@@ -4,13 +4,13 @@ function Circles(){
   var width =960
     , height = 600
     , id = "tax-circle"
-    , circle_radius = 4;
+    , circle_radius = 2
+    , circle_radius_max = 5;
   function chart(selection){
     // the chart function builds the heatmap.
     // note: selection is passed in from the .call(myHeatmap), which is the same as myHeatmap(d3.select('.stuff')) -- ??
     selection.each(function(data){
       console.log(data)
-      console.log(height)
       /*
        * SAMPLE DATA
       {'STATE': 'AK',
@@ -61,7 +61,7 @@ function Circles(){
       var district_color = d3.scaleOrdinal(d3.schemeCategory10)
         .domain(regions);
 
-      // get extent for flagpoles
+      // get extent for stems
       var energyCreditsPerReturnsExtent = d3.extent(state_array,d => (d.nEnergyCredits/d.returns));
       var energyCredits_yScale = d3.scaleLinear()
         .domain(energyCreditsPerReturnsExtent)
@@ -78,6 +78,8 @@ function Circles(){
       var musicScore = svg.append("g")
         .attr("id","score-container")
         .attr("transform","translate("+stave_xstart+","+stave_ystart+")");
+
+      // locate y setpoints for staves
       var stave_yValues = {};
 
       // draw staves
@@ -88,43 +90,74 @@ function Circles(){
        .enter().append("path")
         .attr("class",d => d.STATE)
         .classed("stave",true)
-        .attr("id",d => "stave-"+d)
+        .attr("id",d => "stave-"+d.region_name)
         .attr("d",function(d,i) {
           // pack y-values
           stave_yValues[d] = stave_spacing*(i)
           return "M 0,"+  (stave_yValues[d])+"L"+ stave_length +","+(stave_yValues[d]);
         });
 
-      // buld notes-container
+      // buld notes
       var notes = musicScore.append("g")
         .attr("id","notes-container")
         .selectAll(".note")
         .data(state_array)
        .enter().append("circle")
+        .attr("id",d => "note-"+d.STATE + d.STATEFIPS)
         .attr("class",d => d.STATE)
         .classed("note",true)
-        .attr("r",4)
+        .attr("r",circle_radius)
         .attr("cy",d => stave_yValues[d.region_name])
         .attr("cx",d => notes_xScale( (d.aTaxLiability/d.nTaxLiability) ))
         .style("fill",d => district_color(d.district_name));
 
-
-      var flagpole = musicScore.append("g")
-        .attr("id","flagpole-container")
-        .selectAll(".flagpole")
+      // build stems
+      var stems = musicScore.append("g")
+        .attr("id","stem-container")
+        .selectAll(".stem")
         .data(state_array)
        .enter().append("path")
+        .attr("id",d => "stem-"+d.STATE + d.STATEFIPS)
         .attr("class",d => d.STATE)
-        .classed("flagpole",true)
+        .classed("stem",true)
         .attr("d",function(d,i){
           var x = (notes_xScale((d.aTaxLiability/d.nTaxLiability)) +circle_radius)
             , y1 = stave_yValues[d.region_name]
             , y2 = y1 - energyCredits_yScale(d.nEnergyCredits/d.returns);
           var linePath = "M "+ x + "," + y1 + "L" + x + "," + y2
           return linePath;
-        })
+        });
         //.style("fill",d => district_color(d.district_name));
 
+      // build voronoi
+      var voronoi = d3.voronoi()
+        .x(d => notes_xScale((d.aTaxLiability/d.nTaxLiability)) )
+        .y(d => stave_yValues[d.region_name])
+        .extent([[-20,-40],[stave_length+20 , (stave_spacing * regions.length)]]);
+
+      // draw voronoi polygons
+      var voronoi_polygons = musicScore.append("g")
+        .attr("id","voronoi-container")
+        .selectAll(".voronoi")
+        .data(voronoi.polygons(state_array))
+       .enter().append("path")
+        .classed("voronoi",true)
+        .attr("d", function(d) { return d ? "M" + d.join("L") + "Z" : null; });
+
+      // mouseover
+      voronoi_polygons.on('mouseover',function(d,i){
+        d3.select("#note-"+d.data.STATE + d.data.STATEFIPS)
+          .attr("r",circle_radius_max);
+        d3.select("#stem-"+d.data.STATE + d.data.STATEFIPS)
+          .attr("transform","translate("+(circle_radius_max-circle_radius)+",0)");
+      })
+      // mouseout
+      voronoi_polygons.on('mouseout',function(d,i){
+        d3.select("#note-"+d.data.STATE + d.data.STATEFIPS)
+          .attr("r",circle_radius);
+        d3.select("#stem-"+d.data.STATE + d.data.STATEFIPS)
+          .attr("transform","translate(0,0)");
+      })
 
     })
   }

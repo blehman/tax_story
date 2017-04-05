@@ -6,7 +6,8 @@ function Circles(){
     , clickArray = []
     , id = "tax-circle"
     , circle_radius = 4
-    , circle_radius_max = 7;
+    , circle_radius_max = 7
+    , stem_scale_factor = 0.90;
   function chart(selection){
     // the chart function builds the heatmap.
     // note: selection is passed in from the .call(myHeatmap), which is the same as myHeatmap(d3.select('.stuff')) -- ??
@@ -66,7 +67,7 @@ function Circles(){
       var energyCreditsPerReturnsExtent = d3.extent(state_array,d => (d.nEnergyCredits/d.returns));
       var energyCredits_yScale = d3.scaleLinear()
         .domain(energyCreditsPerReturnsExtent)
-        .range([0,stave_spacing*1.2])
+        .range([0,stave_spacing * stem_scale_factor])
 
       // get extent for notes across x-axis
       var taxLiabilityPerLiableExtent = d3.extent(state_array,d => (d.aTaxLiability/d.nTaxLiability));
@@ -173,6 +174,7 @@ function Circles(){
           .style("opacity",1)
           .style("stroke-width","2px")
           .attr("transform","translate("+(circle_radius_max-circle_radius)+",0)");
+        d3.select(".arc").raise()
       })
       // mouseout
       voronoi_polygons.on('mouseout',function(d,i){
@@ -224,6 +226,8 @@ function Circles(){
           addFlag(k)
         }
         function addFlag(k){
+          d3.select("#note-"+k)
+            .style("stroke-width","1.5px");
           console.log("test: addFlag")
           console.log(d.data)
           , x1 = (notes_xScale((d.data.aTaxLiability/d.data.nTaxLiability)) +circle_radius)
@@ -239,7 +243,8 @@ function Circles(){
 
         }
         function removeFlag(k){
-          console.log("test: removeFlag")
+          d3.select("#note-"+k)
+            .style("stroke-width","0.25px");
           var flag = note_stem_container.selectAll("#flag-"+k).remove();
         }
         function comp(){
@@ -250,11 +255,13 @@ function Circles(){
             // remove flags
             //removeFlag(k)
             // get coordiinates for line
-            d3.select("#stem-"+k).each(function(d){
+            d3.select("#note-"+k).each(function(d){
               var x1 = (notes_xScale((d.aTaxLiability/d.nTaxLiability)) +circle_radius)
                 , y1 = stave_yValues[d.region_name]
                 , y2 = y1 - energyCredits_yScale(d.nEnergyCredits/d.returns)
-              linePoints.push([x1,y2])
+                , cy = stave_yValues[d.region_name]
+                , cx = notes_xScale( (d.aTaxLiability/d.nTaxLiability) )
+              linePoints.push([cx,cy])
               compValues[k] = d
             })
           })
@@ -262,6 +269,10 @@ function Circles(){
           addText(compValues)
         }
         function drawArc(coords){
+          var line = d3.line()
+            .x(d => d[0])
+            .y(d => d[1])
+            .curve(d3.curveCardinal.tension(0.5));
           // draw arc
           note_stem_container.selectAll(".arc")
             .data([coords])
@@ -272,8 +283,22 @@ function Circles(){
                 , y1 = d[0][1]
                 , x2 = d[1][0]
                 , y2 = d[1][1];
+              var dx = x2 - x1,
+                  dy = y2 - y1,
+                  dr = Math.sqrt(dx * dx + dy * dy);
+              return "M" + x1 + "," + y1 + "A" + dr + "," + dr +
+          " 0 0,0 " + x2 + "," + y2;
+            })
+            /*
+            .attr("d",function(d){
+              var x1 = d[0][0]
+                , y1 = d[0][1]
+                , x2 = d[1][0]
+                , y2 = d[1][1];
               return "M"+x1+","+y1+"L"+x2+","+y2;
             })
+            */
+            //.attr("d",line)
         }
         function removeArc(){
           d3.selectAll(".arc").remove()

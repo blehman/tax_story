@@ -7,7 +7,13 @@ function Circles(){
     , id = "tax-circle"
     , circle_radius = 4
     , circle_radius_max = 7
-    , stem_scale_factor = 0.90;
+    , stem_scale_factor = 0.90
+    , line = d3.line()
+        .x(d => d[0])
+        .y(d => d[1])
+        //.curve(d3.curveCardinal.tension(0.5));
+        //.curve(d3.curveBundle.beta(1));
+        .curve(d3.curveBasis);
   function chart(selection){
     // the chart function builds the heatmap.
     // note: selection is passed in from the .call(myHeatmap), which is the same as myHeatmap(d3.select('.stuff')) -- ??
@@ -137,11 +143,31 @@ function Circles(){
         .attr("cx",d => notes_xScale( (d.aTaxLiability/d.nTaxLiability) ))
         .style("fill",d => district_color(d.district_name));
 
+      // build flags
+      var flags = note_stem_container.selectAll(".flags")
+        .data(state_array)
+       .enter().append("path")
+        .attr("id",d => "flags-"+ d.STATE + d.STATEFIPS)
+        .classed("flags",true)
+        .attr("d",function(d,i){
+          var x = (notes_xScale((d.aTaxLiability/d.nTaxLiability)) +circle_radius)
+            , y1 = stave_yValues[d.region_name]
+            , y2 = y1 - energyCredits_yScale(d.nEnergyCredits/d.returns)
+            , p1 = [x,y2]
+            , p2 = [x+1,y2+1]
+            , p3 = [x+1,y2+3]
+            , p4 = [x+2,y2+6]
+            , p5 = [x+3, y2+7]
+            , p6 = [x+4,y2+8];
+          var points = [p1,p2,p3,p4,p5,p6]
+          return line(points)
+        })
       // put the stems and notes in order on the svg
       state_array.map(function(d,i){
         var key = d.STATE + d.STATEFIPS;
         d3.select("#stem-"+key).raise()
         d3.select("#note-"+key).raise()
+        d3.select("#flags-"+key).raise()
       })
 
         //.style("fill",d => district_color(d.district_name));
@@ -174,18 +200,30 @@ function Circles(){
           .style("opacity",1)
           .style("stroke-width","2px")
           .attr("transform","translate("+(circle_radius_max-circle_radius)+",0)");
+        // move flag
+        d3.select("#flags-"+d.data.STATE + d.data.STATEFIPS)
+          .raise()
+          .style("opacity", d3.select("#flags-"+d.data.STATE + d.data.STATEFIPS).style("opacity")*2)
+          .style("stroke-width","2px")
+          .attr("transform","translate("+(circle_radius_max-circle_radius)+",0)");
         d3.select(".arc").raise()
       })
       // mouseout
       voronoi_polygons.on('mouseout',function(d,i){
-        // decrease note radious
+        // decrease note radius
         d3.select("#note-"+d.data.STATE + d.data.STATEFIPS)
           .raise()
           .attr("r",circle_radius);
-        // decrease note radious
+        // move stem
         d3.select("#stem-"+d.data.STATE + d.data.STATEFIPS)
           .raise()
           .style("opacity",0.50)
+          .style("stroke-width","0.50px")
+          .attr("transform","translate(0,0)");
+        // move flag
+        d3.select("#flags-"+d.data.STATE + d.data.STATEFIPS)
+          .raise()
+          .style("opacity",d3.select("#flags-"+d.data.STATE + d.data.STATEFIPS).style("opacity")/2)
           .style("stroke-width","0.50px")
           .attr("transform","translate(0,0)");
         // raise arc to always be on top
@@ -228,24 +266,14 @@ function Circles(){
         function addFlag(k){
           d3.select("#note-"+k)
             .style("stroke-width","1.5px");
-          console.log("test: addFlag")
-          console.log(d.data)
-          , x1 = (notes_xScale((d.data.aTaxLiability/d.data.nTaxLiability)) +circle_radius)
-          , x2 = x1+10
-          , y1 = stave_yValues[d.data.region_name]
-          , y2 = y1 - energyCredits_yScale(d.data.nEnergyCredits/d.data.returns)
-          , y3 = y2+5;
-
-          var flag = note_stem_container.append("path")
-              .attr("id","flag-"+k)
-              .classed("flag",true)
-              .attr("d","M"+x1+","+y2+"L"+x2+","+y3);
-
+          d3.select("#flags-"+k)
+            .style("opacity",1)
         }
         function removeFlag(k){
           d3.select("#note-"+k)
             .style("stroke-width","0.25px");
-          var flag = note_stem_container.selectAll("#flag-"+k).remove();
+          d3.select("#flags-"+k)
+            .style("opacity",0.0);
         }
         function comp(){
           var linePoints = []
@@ -269,10 +297,12 @@ function Circles(){
           addText(compValues)
         }
         function drawArc(coords){
+          /*
           var line = d3.line()
             .x(d => d[0])
             .y(d => d[1])
             .curve(d3.curveCardinal.tension(0.5));
+          */
           // draw arc
           note_stem_container.selectAll(".arc")
             .data([coords])

@@ -6,7 +6,7 @@ function Circles(){
     , clickArray = []
     , id = "tax-circle"
     , circle_radius = 4
-    , circle_radius_max = 7
+    , circle_radius_max = 15
     , stem_scale_factor = 0.90
     , line = d3.line()
         .x(d => d[0])
@@ -76,10 +76,11 @@ function Circles(){
         .range([0,stave_spacing * stem_scale_factor])
 
       // get extent for notes across x-axis
-      var taxLiabilityPerLiableExtent = d3.extent(state_array,d => (d.aTaxLiability/d.nTaxLiability));
+      //var taxLiabilityPerLiableExtent = d3.extent(state_array,d => (d.aTaxLiability/d.aTotalIncome));
+      var taxLiabilityPerIncomeExtent = d3.extent(state_array,d => (d.aTaxLiability/d.aTotalIncome));
       // define xScale for notes
       var notes_xScale = d3.scaleLinear()
-        .domain(taxLiabilityPerLiableExtent)
+        .domain(taxLiabilityPerIncomeExtent)
         .range([circle_radius,stave_length-circle_radius])
 
       // staves (regions) container
@@ -120,7 +121,7 @@ function Circles(){
         .attr("class",d => d.STATE)
         .classed("stem",true)
         .attr("d",function(d,i){
-          var x = (notes_xScale((d.aTaxLiability/d.nTaxLiability)) +circle_radius)
+          var x = (notes_xScale((d.aTaxLiability/d.aTotalIncome)) +circle_radius)
             , y1 = stave_yValues[d.region_name]
             , y2 = y1 - energyCredits_yScale(d.nEnergyCredits/d.returns);
           var linePath = "M "+ x + "," + y1 + "L" + x + "," + y2
@@ -140,7 +141,7 @@ function Circles(){
         .classed("note",true)
         .attr("r",circle_radius)
         .attr("cy",d => stave_yValues[d.region_name])
-        .attr("cx",d => notes_xScale( (d.aTaxLiability/d.nTaxLiability) ))
+        .attr("cx",d => notes_xScale( (d.aTaxLiability/d.aTotalIncome) ))
         .style("fill",d => district_color(d.district_name));
 
       // build flags
@@ -150,7 +151,7 @@ function Circles(){
         .attr("id",d => "flags-"+ d.STATE + d.STATEFIPS)
         .classed("flags",true)
         .attr("d",function(d,i){
-          var x = (notes_xScale((d.aTaxLiability/d.nTaxLiability)) +circle_radius)
+          var x = (notes_xScale((d.aTaxLiability/d.aTotalIncome)) +circle_radius)
             , y1 = stave_yValues[d.region_name]
             , y2 = y1 - energyCredits_yScale(d.nEnergyCredits/d.returns)
             , p1 = [x,y2]
@@ -174,7 +175,7 @@ function Circles(){
 
       // build voronoi
       var voronoi = d3.voronoi()
-        .x(d => notes_xScale((d.aTaxLiability/d.nTaxLiability)) )
+        .x(d => notes_xScale((d.aTaxLiability/d.aTotalIncome)) )
         .y(d => stave_yValues[d.region_name])
         .extent([[-20,-40],[stave_length+20 , (stave_spacing * regions.length)]]);
 
@@ -193,7 +194,8 @@ function Circles(){
         // increase note radious
         d3.select("#note-"+d.data.STATE + d.data.STATEFIPS)
           .raise()
-          .attr("r",circle_radius_max);
+          .attr("r",circle_radius_max)
+          .style("stroke-width","2px");
         // move and fill stem
         d3.select("#stem-"+d.data.STATE + d.data.STATEFIPS)
           .raise()
@@ -213,7 +215,8 @@ function Circles(){
         // decrease note radius
         d3.select("#note-"+d.data.STATE + d.data.STATEFIPS)
           .raise()
-          .attr("r",circle_radius);
+          .attr("r",circle_radius)
+          .style("stroke-width","0.50px");
         // move stem
         d3.select("#stem-"+d.data.STATE + d.data.STATEFIPS)
           .raise()
@@ -284,11 +287,11 @@ function Circles(){
             //removeFlag(k)
             // get coordiinates for line
             d3.select("#note-"+k).each(function(d){
-              var x1 = (notes_xScale((d.aTaxLiability/d.nTaxLiability)) +circle_radius)
+              var x1 = (notes_xScale((d.aTaxLiability/d.aTotalIncome)) +circle_radius)
                 , y1 = stave_yValues[d.region_name]
                 , y2 = y1 - energyCredits_yScale(d.nEnergyCredits/d.returns)
                 , cy = stave_yValues[d.region_name]
-                , cx = notes_xScale( (d.aTaxLiability/d.nTaxLiability) )
+                , cx = notes_xScale( (d.aTaxLiability/d.aTotalIncome) )
               linePoints.push([cx,cy])
               compValues[k] = d
             })
@@ -335,12 +338,12 @@ function Circles(){
         }
         function addText(compValues){
           removeText()
-          console.log(compValues)
+          //console.log(compValues)
           var state1 = clickArray[0]
             , state2 = clickArray[1];
 
           var insight1 = compValues[state1].STATE +" saved $"+compValues[state1].aEnergyCredits +" from energy credits compared to "+ compValues[state2].STATE +"'s $"+compValues[state2].aEnergyCredits+" savings";
-          console.log(insight1);
+          //console.log(insight1);
           musicScore.append("g")
             .classed("insights",true)
             .append("text")
@@ -355,7 +358,7 @@ function Circles(){
         }
         function removeText(){
           musicScore.select(".insights").remove()
-          console.log("test: removeText")
+          //console.log("test: removeText")
         }
 
         // decrease note radious

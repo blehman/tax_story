@@ -144,6 +144,17 @@ function Circles(){
         .attr("cx",d => notes_xScale( (d.aTaxLiability/d.aTotalIncome) ))
         .style("fill",d => district_color(d.district_name));
 
+      // add state text to note
+      var stateText = note_stem_container
+        .selectAll(".state-text")
+        .data(state_array)
+       .enter().append("text")
+        .attr("x", d => notes_xScale( (d.aTaxLiability/d.aTotalIncome) ))
+        .attr("y", d => stave_yValues[d.region_name])
+        .attr("id",d => "stateText-"+d.STATE + d.STATEFIPS)
+        .classed("state-text",true)
+        .text(d=>d.STATE);
+
       // build flags
       var flags = note_stem_container.selectAll(".flags")
         .data(state_array)
@@ -169,6 +180,7 @@ function Circles(){
         d3.select("#stem-"+key).raise()
         d3.select("#note-"+key).raise()
         d3.select("#flags-"+key).raise()
+        d3.select("#stateText-"+key).raise()
       })
 
         //.style("fill",d => district_color(d.district_name));
@@ -208,6 +220,10 @@ function Circles(){
           .style("opacity", d3.select("#flags-"+d.data.STATE + d.data.STATEFIPS).style("opacity")*2)
           .style("stroke-width","2px")
           .attr("transform","translate("+(circle_radius_max-circle_radius)+",0)");
+        d3.select("#stateText-"+d.data.STATE + d.data.STATEFIPS)
+          .raise()
+          .style("opacity", 1)
+          .attr("transform","translate("+0+","+3.5+")");
         d3.select(".arc").raise()
       })
       // mouseout
@@ -229,6 +245,9 @@ function Circles(){
           .style("opacity",d3.select("#flags-"+d.data.STATE + d.data.STATEFIPS).style("opacity")/2)
           .style("stroke-width","0.50px")
           .attr("transform","translate(0,0)");
+        d3.select("#stateText-"+d.data.STATE + d.data.STATEFIPS)
+          .raise()
+          .style("opacity", 0)
         // raise arc to always be on top
         d3.select(".arc").raise()
       })

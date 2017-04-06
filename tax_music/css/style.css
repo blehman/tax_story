@@ -52,3 +52,9 @@
     opacity:0.5;
     stroke-linecap: round;
 }
+.state-text{
+  font-size:12px;
+  opacity: 0;
+  stroke: black;
+  text-anchor: middle;
+}

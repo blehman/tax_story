@@ -15,7 +15,7 @@ The facts below are related to tech, e-filing, and the enviroment.
 1. In 2017, the acting head of the EPA made a declaration that CO<sub>2</sub> is not a primary contributor to global warming [source](https://www.nytimes.com/2017/03/09/us/politics/epa-scott-pruitt-global-warming.html)
 1. Further historical facts from e-filing from the IRS are available [here](https://www.irs.gov/uac/irs-e-file-a-history)
 
-####Stats:  
+#### Stats:  
 * The following information is reported by the IRS :
     1. The total number of tax returns filed in 1990 [source](https://www.irs.gov/pub/irs-soi/90inar.pdf):
         * 113,717,138 returns filed
@@ -38,7 +38,7 @@ The facts below are related to tech, e-filing, and the enviroment.
 ## Energy
 The information below lays out the assumptions used to build an approximation for how much CO<sub>2</sub> is used to paper file versus efile.  
 
-####Assumptions:
+#### Assumptions:
 * The International Post Corporation reported in their [2016 sustainability report](https://www.ipc.be/en/knowledge-centre/sustainability/sustainability-report) that mailing 1 letter in 2015 required 37.2g of CO<sub>2</sub>. We use this number as the lower bound for the carbon used to paper file taxes. For all years not present, the 37.2g of CO<sub>2</sub> is assumed to be the 
     
 * The total number of hours it takes to file a tax return is assumed to be 9 hours for 70% of returns and 22 hours for the remaining 30% [source](https://www.irs.gov/instructions/i1040a/ar03.html)

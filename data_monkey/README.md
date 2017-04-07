@@ -1,9 +1,11 @@
-__
+____
 
 #Data Gathering
-__
+____
 
 ## History 
+
+#### Facts:
 The facts below are related to tech, e-filing, and the environment.
 
 1. In 1981, the first laptop was publically available for purchase, which weighed over 20lbs and had a 5 inch screen. [source](https://en.wikipedia.org/wiki/Laptop)
@@ -39,26 +41,29 @@ The facts below are related to tech, e-filing, and the environment.
     * 2025: 99.9%
   
 ## Energy
-The information below lays out the assumptions used to build an approximation for how much CO<sub>2</sub> is used to paper file versus efile. 
 
-Assumptions:
-* The International Post Corporation reported in their [2016 sustainability report](https://www.ipc.be/en/knowledge-centre/sustainability/sustainability-report) that mailing 1 letter in 2015 required 37.2g of CO<sub>2</sub>. We use this number as the lower bound for the carbon used to paper file taxes. For all years not present, the 37.2g of CO<sub>2</sub> is assumed to be the 
+
+#### Assumptions:
+The information below lays out the assumptions used to build an approximation for how much CO<sub>2</sub> is used to paper file versus efile. 
+* The International Post Corporation reported in their [2016 sustainability report](https://www.ipc.be/en/knowledge-centre/sustainability/sustainability-report) that mailing 1 letter in 2015 required 37.2g of CO<sub>2</sub>. We use this number as the lower bound for the carbon used to paper file taxes.   
     
-* The total number of hours it takes to file a tax return is assumed to be 9 hours for 70% of returns and 22 hours for the remaining 30% [source](https://www.irs.gov/instructions/i1040a/ar03.html)
-* On average, electricity sources emit 1.222lbs CO2 per kWh (0.0005925 metric tons CO2 per kWh) [source](https://carbonfund.org/how-we-calculate/), which is assumed to be constant across all years.
-* Laptops are assumed to require 70 watts the following instantaneous watts [source1](https://support.apple.com/en-us/HT201700) [source2](https://support.apple.com/en-us/HT201796)
+* The total number of hours it takes to file a tax return is assumed to be 9 hours for 70% of returns and 22 hours for the remaining 30% [source](https://www.irs.gov/instructions/i1040a/ar03.html)  
+
+* On average, electricity sources emit 1.222lbs CO2 per kWh (0.0005925 metric tons CO2 per kWh) [source](https://carbonfund.org/how-we-calculate/), which is assumed to be constant across all years.  
+
+* Laptops are assumed to require 70 watts the following instantaneous watts [source1](https://support.apple.com/en-us/HT201700) [source2](https://support.apple.com/en-us/HT201796)  
     
 * Laptops are assumed to be responsible for all e-filing. [NO SOURCE]
 
 
 ## Formulas
-The equation for calculating the total CO<sub>2</sub> from paper filings:
+* The equation for calculating the total CO<sub>2</sub> from paper filings:
 
 \begin{equation}
 paperCO_2 =  (number\ of\ returns\ in\ the\ year) * (\%paper\ filing) * (CO_2\ per\ mailed\ letter) 
 \end{equation}  
 
-The equation for calculating the total CO<sub>2</sub> from e-filings included the assumption for the different time taken to prepare business and non-business tax returns: 
+* The equation(s) for calculating the total CO<sub>2</sub> from e-filings included the assumption for the different time taken to prepare business and non-business tax returns: 
 
 \begin{equation}
 efile30CO_2 = (number\ of\ returns\ in\ this\ year) * (\%efile\ filing) * (30\%) * (9\ hrs\ to\ prepare\ return) * (laptop\ watts) * (CO_2\ conversion)  
@@ -71,4 +76,3 @@ efile70CO_2 = (number\ of\ returns\ in\ this\ year) * (\%efile\ filing) * (70\%)
 \begin{equation}
 efileCO_2 = efile30CO_2 + efile70CO_2  
 \end{equation}
-

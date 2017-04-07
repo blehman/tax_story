@@ -57,6 +57,9 @@ The information below lays out the assumptions used to build an approximation fo
 
 
 ## Formulas
+As of 2017-04-07, the LaTeX formulas below are not rending. Please see
+the Jupyter notebook containing the formulas here: [TaxReturnCO2.ipynb](TaxReturnCO2.ipynb).  
+
 * The equation for calculating the total CO<sub>2</sub> from paper filings:
 
 \begin{equation}

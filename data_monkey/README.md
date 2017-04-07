@@ -49,20 +49,22 @@ The information below lays out the assumptions used to build an approximation fo
 
 
 ## Formulas
-The equation for calculating the total CO<sub>2</sub> from paper filings:
+The equation for calculating the total CO<sub>2</sub> from paper filings:  
+
 \begin{equation}
 paperCO_2 =  (number\ of\ returns\ in\ the\ year) * (\%paper\ filing) * (CO_2\ per\ mailed\ letter) 
 \end{equation}  
 
-The equation for calculating the total CO<sub>2</sub> from e-filings included the assumption for the different time taken to prepare business and non-business tax returns: 
+The equation for calculating the total CO<sub>2</sub> from e-filings included the assumption for the different time taken to prepare business and non-business tax returns:  
+
 \begin{equation}
 efileCO_230 = (number\ of\ returns\ in\ this\ year) * (\%efile\ filing) * (30\%) * (9\ hrs\ to\ prepare\ return) * (laptop\ watts) * (CO_2\ conversion)  
-\end{equation} 
+\end{equation}   
 
 \begin{equation}
 efileCO_270 = (number\ of\ returns\ in\ this\ year) * (\%efile\ filing) * (70\%) * (22\ hrs\ to\ prepare\ return) * (laptop\ watts) * (CO_2\ conversion)  
-\end{equation}
+\end{equation}  
 
-\begin{equation}
+\begin{equation} 
 efileCO_2 = efileCO_230 + efileCO_270  
-\end{equation}
+\end{equation}  

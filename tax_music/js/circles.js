@@ -61,9 +61,9 @@ function Circles(){
 
       // define staves (regions) spacing
       var stave_spacing = 40
-        , stave_xstart = 100
+        , stave_xstart = 20
         , stave_ystart = 100
-        , stave_length = 300;
+        , stave_length = 500;
 
       // create color scale by district
       var district_color = d3.scaleOrdinal(d3.schemeCategory10)
@@ -79,7 +79,7 @@ function Circles(){
       //var taxLiabilityPerLiableExtent = d3.extent(state_array,d => (d.aTaxLiability/d.aTotalIncome));
       var taxLiabilityPerIncomeExtent = d3.extent(state_array,d => (d.aTaxLiability/d.aTotalIncome));
       // define xScale for notes
-      var notes_xScale = d3.scaleLinear()
+      var notes_xScale = d3.scaleLog()
         .domain(taxLiabilityPerIncomeExtent)
         .range([circle_radius,stave_length-circle_radius])
 

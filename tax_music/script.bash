@@ -25,4 +25,10 @@ geo2topo -n counties.ndjson > counties-topo.json
 topomerge states=counties -k 'd.id.slice(0, 2)' < counties-topo.json > states-topo.json
 
 ## parse nation (the combined file now has nation, states, and counties)
-topomerge nation=states < states-topo.json > us-topo.json
+topomerge nation=states < states-topo.json > us-counties-states-nation.json
+
+## simplify the topojson
+toposimplify -p 1 -f < us-counties-states-nation.json > us-simplify-topo.json
+
+## quanity the topojson
+topoquantize 1e5 < us-simplify-topo.json > us-quantized-topo.json

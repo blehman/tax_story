@@ -3,7 +3,8 @@
   d3.queue()
     .defer(d3.json, "data/statefips_counts_obj.json")
     .defer(d3.json, "data/statefips_counts_array.json")
-    .defer(d3.json, "data/county_state_nation/us-counties-states-nation.json")
+    //.defer(d3.json, "data/county_state_nation/us-counties-states-nation.json")
+    .defer(d3.json, "data/county_state_nation/us-quantized-topo.json")
     .await(ready);
 
   function ready(error,state_obj,state_array,us){

@@ -3,12 +3,14 @@
 function Map(){
   var width =960
     , height = 600
-    , id = "us-map";
+    , id = "us-map"
+    , circle_radius = 4
+    , circle_radius_max = 15;
 
   // set projection
   var projection = d3.geoAlbersUsa()
-      .scale(300)
-      .translate([280,300]);
+      .scale(200)
+      .translate([465,120]);
   // create function for path
   var geoPath = d3.geoPath()
       .projection(projection)
@@ -17,9 +19,6 @@ function Map(){
     // the chart function builds the heatmap.
     // note: selection is passed in from the .call(myHeatmap), which is the same as myHeatmap(d3.select('.stuff')) -- ??
     selection.each(function(data){
-      console.log(data)
-      console.log(selection)
-      console.log(this)
       var regions = data.regions
         , districts = data.districts
         , state_array = data.state_array
@@ -30,13 +29,13 @@ function Map(){
 
       var district_color = d3.scaleOrdinal(d3.schemeCategory10)
         .domain(districts);
-        console.log(districts)
 
-      var map = selection.append("g")
+      var regionalMap = selection.append("g")
           .attr("id","map")
           .selectAll(".state")
           .data(topojson.feature(us,us.objects.states).features)
          .enter().append("path")
+          .attr("id",d => "states-"+d.id)
           .attr("class",function(d){
             if (d.id == "72" || d.id == "69" || d.id == "60" || d.id == "78" || d.id == "66"){
               return "none";
@@ -46,27 +45,91 @@ function Map(){
           .classed("state",true)
           .attr("d",geoPath)
           .style("fill",function(d){
-            console.log("state"+d.id)
             if (d.id == "72" || d.id == "69" || d.id == "60" || d.id == "78" || d.id == "66"){
               return "none";
             }else{
               var color = district_color( state_lookup["state"+d.id].district_name );
-              console.log(color)
               return district_color( state_lookup["state"+d.id].district_name )
             }
           })
 
+      regionalMap.on("mouseover", function(d) {
+        // state map
+        var state = d3.select(this);
+        state
+          .style("stroke-width","2px")
+          .style("opacity",1);
+        // increase note radious
+        d3.select("#note-state" + d.id)
+          .raise()
+          .attr("r",circle_radius_max)
+          .style("stroke-width","2px")
+          .style("opacity",1);
+        // move and fill stem
+        d3.select("#stem-state"+ d.id)
+          .raise()
+          .style("opacity",1)
+          .style("stroke-width","2px")
+          .attr("transform","translate("+(circle_radius_max-circle_radius)+",0)");
+        // move flag
+        d3.select("#flags-state"+ d.id)
+          .raise()
+          .style("opacity", d3.select("#flags-state" + d.id).style("opacity")*2)
+          .style("stroke-width","2px")
+          .attr("transform","translate("+(circle_radius_max-circle_radius)+",0)");
+        d3.select("#stateText-state"+ d.id)
+          .raise()
+          .style("opacity", 1)
+          .attr("transform","translate("+0+","+3.5+")");
+        d3.select(".arc").raise()
+      })
+
+      regionalMap.on("mouseout", function(d) {
+        // state map
+        var state = d3.select(this);
+        state
+          .style("stroke-width","0.50px")
+          .style("opacity",0.7)
+        d3.select("#note-state" + d.id)
+          .raise()
+          .attr("r",circle_radius)
+          .style("stroke-width","0.50px");
+        // move stem
+        d3.select("#stem-state" + d.id)
+          .raise()
+          .style("opacity",0.50)
+          .style("stroke-width","0.50px")
+          .attr("transform","translate(0,0)");
+        // move flag
+        d3.select("#flags-state" + d.id)
+          .raise()
+          .style("opacity",d3.select("#flags-state" + d.id).style("opacity")/2)
+          .style("stroke-width","0.50px")
+          .attr("transform","translate(0,0)");
+        d3.select("#stateText-state" + d.id)
+          .raise()
+          .style("opacity", 0)
+        // select map
+        d3.select("#states-"+d.id)
+          .style("stroke-width","0.5px")
+          .style("opacity",0.7)
+        // raise arc to always be on top
+        d3.select(".arc").raise()
+
+      })
+
+
       // move region-West
       d3.selectAll(".region-West")
-        .attr("transform","translate(0,10)");
+        .attr("transform","translate(0,7)");
 
       // move regions
       d3.selectAll(".region-South")
-        .attr("transform","translate(-10,0)");
+        .attr("transform","translate(-7,0)");
 
       // move regions
       d3.selectAll(".region-Northeast")
-        .attr("transform","translate(10,0)");
+        .attr("transform","translate(7,0)");
 /*
       // define staves (regions) spacing
       var stave_spacing = 40

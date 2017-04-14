@@ -18,7 +18,6 @@ function MusicalScore(){
     // the chart function builds the heatmap.
     // note: selection is passed in from the .call(myHeatmap), which is the same as myHeatmap(d3.select('.stuff')) -- ??
     selection.each(function(data){
-      console.log(data)
       /*
        * SAMPLE DATA
       {'STATE': 'AK',
@@ -61,9 +60,9 @@ function MusicalScore(){
 
       // define staves (regions) spacing
       var stave_spacing = 40
-        , stave_xstart = 20
-        , stave_ystart = 100
-        , stave_length = 500;
+        , stave_xstart = 50
+        , stave_ystart = 60
+        , stave_length = 300;
 
       // create color scale by district
       var district_color = d3.scaleOrdinal(d3.schemeCategory10)
@@ -207,7 +206,8 @@ function MusicalScore(){
         d3.select("#note-state" + d.data.STATEFIPS)
           .raise()
           .attr("r",circle_radius_max)
-          .style("stroke-width","2px");
+          .style("stroke-width","2px")
+          .style("opacity",1);
         // move and fill stem
         d3.select("#stem-state"+ d.data.STATEFIPS)
           .raise()
@@ -225,6 +225,10 @@ function MusicalScore(){
           .style("opacity", 1)
           .attr("transform","translate("+0+","+3.5+")");
         d3.select(".arc").raise()
+        // select map
+        d3.select("#states-"+d.data.STATEFIPS)
+          .style("stroke-width","2px")
+          .style("opacity",1.0)
       })
       // mouseout
       voronoi_polygons.on('mouseout',function(d,i){
@@ -248,6 +252,10 @@ function MusicalScore(){
         d3.select("#stateText-state" + d.data.STATEFIPS)
           .raise()
           .style("opacity", 0)
+        // select map
+        d3.select("#states-"+d.data.STATEFIPS)
+          .style("stroke-width","0.5px")
+          .style("opacity",0.7)
         // raise arc to always be on top
         d3.select(".arc").raise()
       })
@@ -276,13 +284,11 @@ function MusicalScore(){
         }
         function clear(k){
           clickArray = clickArray.filter(d => d!=k)
-          //console.log(clickArray)
           removeFlag(k)
           removeArc(k)
         }
         function add(k){
           clickArray.push(k)
-          //console.log(clickArray)
           addFlag(k)
         }
         function addFlag(k){
@@ -357,12 +363,10 @@ function MusicalScore(){
         }
         function addText(compValues){
           removeText()
-          //console.log(compValues)
           var state1 = clickArray[0]
             , state2 = clickArray[1];
 
           var insight1 = compValues[state1].STATE +" saved $"+compValues[state1].aEnergyCredits +" from energy credits compared to "+ compValues[state2].STATE +"'s $"+compValues[state2].aEnergyCredits+" savings";
-          //console.log(insight1);
           musicScore.append("g")
             .classed("insights",true)
             .append("text")
@@ -377,7 +381,6 @@ function MusicalScore(){
         }
         function removeText(){
           musicScore.select(".insights").remove()
-          //console.log("test: removeText")
         }
 
         // decrease note radious

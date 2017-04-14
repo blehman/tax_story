@@ -13,6 +13,8 @@
     left: 0;
 }
 
+/* NOTES CSS */
+
 .stave{
     stroke: #000;
     stroke-width: 0.50px;
@@ -58,3 +60,12 @@
   stroke: black;
   text-anchor: middle;
 }
+
+/*MAP CSS*/
+
+.state{
+  fill:gray;
+  stroke: black;
+  stroke-width: 0.5px;
+}
+

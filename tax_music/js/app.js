@@ -3,9 +3,10 @@
   d3.queue()
     .defer(d3.json, "data/statefips_counts_obj.json")
     .defer(d3.json, "data/statefips_counts_array.json")
+    .defer(d3.json, "data/county_state_nation/us-counties-states-nation.json")
     .await(ready);
 
-  function ready(error,state_obj,state_array){
+  function ready(error,state_obj,state_array,us){
     if (error) throw error;
     /* SAMPLE DATA
     {
@@ -42,6 +43,7 @@
       ,"state_array":state_array
       ,"regions":regions
       ,"districts":districts
+      ,"us":us
     }
     console.log(data)
 
@@ -60,14 +62,27 @@
         .attr("id","viz-container");
 
 
-    // call the circle constructor
-    var iCircles = Circles();
+    // call the musical score constructor
+    var iMusic = MusicalScore();
 
-    svg.selectAll("#"+iCircles.id())
+    svg.selectAll("#"+iMusic.id())
       .data([data])
      .enter().append("g")
-      .attr('id',iCircles.id())
-      .call(iCircles);
+      .attr('id',iMusic.id())
+      .call(iMusic);
+
+
+    // call the map constructor
+    var iMap = Map();
+
+    svg.selectAll("#"+iMap.id())
+      .data([data])
+     .enter().append("g")
+      .attr('id',iMap.id())
+      .call(iMap);
+
+
+
 
   }
 }())

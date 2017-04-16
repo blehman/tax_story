@@ -14,6 +14,9 @@ function MusicalScore(){
         //.curve(d3.curveCardinal.tension(0.5));
         //.curve(d3.curveBundle.beta(1));
         .curve(d3.curveBasis);
+
+
+
   function chart(selection){
     // the chart function builds the heatmap.
     // note: selection is passed in from the .call(myHeatmap), which is the same as myHeatmap(d3.select('.stuff')) -- ??
@@ -72,7 +75,13 @@ function MusicalScore(){
       var energyCreditsPerReturnsExtent = d3.extent(state_array,d => (d.nEnergyCredits/d.returns));
       var energyCredits_yScale = d3.scaleLinear()
         .domain(energyCreditsPerReturnsExtent)
-        .range([0,stave_spacing * stem_scale_factor])
+        .range([0,stave_spacing * stem_scale_factor]);
+
+      var datas = [0,1,2,3,4];
+      // create a bandScale for y-values
+      var staveBand = d3.scaleBand()
+          .domain(datas)
+        .range(energyCredits_yScale.range());
 
       // get extent for notes across x-axis
       //var taxLiabilityPerLiableExtent = d3.extent(state_array,d => (d.aTaxLiability/d.aTotalIncome));
@@ -91,21 +100,37 @@ function MusicalScore(){
       var stave_yValues = {};
 
       // draw staves
-      var staves = musicScore
+      var staves_container = musicScore
         .append("g")
-        .attr("id","staves-container")
-        .selectAll(".stave")
+        .attr("id","staves-container");
+
+      var staves = staves_container.selectAll(".stave")
         .data(regions)
        .enter().append("path")
-        .attr("class",d => d.STATE)
         .classed("stave",true)
-        .attr("id",d => "stave-"+d.region_name)
+        .attr("id",d => "stave-"+d)
         .attr("d",function(d,i) {
           // pack y-values
           stave_yValues[d] = stave_spacing*(i)
           return "M 0,"+  (stave_yValues[d])+"L"+ stave_length +","+(stave_yValues[d]);
         });
 
+      // add-on staves to each region
+      staves.each( function(d){
+
+
+        staves_container.selectAll(".stave-"+d+"_add-ons")
+          .data(datas)
+         .enter().append("path")
+          .attr("class","stave")
+          .classed("stave-"+d+"_add-ons",true)
+          .attr("d",function(element,i) {
+            var y_val = stave_yValues[d]-staveBand(element);
+            return "M 0,"+  y_val +"L"+ stave_length +","+y_val
+          });
+      });
+
+      //})
       var note_stem_container = musicScore.append("g").attr("id","note-stem-container")
 
       // build stems
@@ -139,7 +164,11 @@ function MusicalScore(){
         .attr("class",d => d.STATE)
         .classed("note",true)
         .attr("r",circle_radius)
-        .attr("cy",d => stave_yValues[d.region_name])
+        //.attr("cy",d => stave_yValues[d.region_name])
+        .attr("cy",function(d,i){
+          var y1 = stave_yValues[d.region_name]
+            , y2 = y1 - energyCredits_yScale(d.nEnergyCredits/d.returns)
+            return y2;})
         .attr("cx",d => notes_xScale( (d.aTaxLiability/d.aTotalIncome) ))
         .style("fill",d => district_color(d.district_name))
         .attr("selected",false);
@@ -390,7 +419,7 @@ function MusicalScore(){
             .curve(d3.curveCardinal.tension(0.5));
           */
           // draw arc
-          
+
           note_stem_container.selectAll(".arc")
             .data([coords])
            .enter().append("path")

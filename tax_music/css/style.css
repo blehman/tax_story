@@ -18,7 +18,7 @@
 .stave{
     stroke: #000;
     stroke-width: 0.50px;
-    opacity:0.5
+    stroke-opacity:0.10
     stroke-linecap: round;
 }
 .note{

@@ -38,7 +38,8 @@
     }
     */
 
-    var regions = d3.map(state_array,d=>d.region_name).keys()
+    //var regions = d3.map(state_array,d=>d.region_name).keys()
+    var regions = ["Northeast","Midwest","South","West"]
         , districts = d3.map(state_array,d=>d.district_name).keys()
     var data = {"state_lookup":state_obj
       ,"state_array":state_array

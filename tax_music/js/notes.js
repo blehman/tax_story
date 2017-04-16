@@ -179,7 +179,11 @@ function MusicalScore(){
         .data(state_array)
        .enter().append("text")
         .attr("x", d => notes_xScale( (d.aTaxLiability/d.aTotalIncome) ))
-        .attr("y", d => stave_yValues[d.region_name])
+        //.attr("y", d => stave_yValues[d.region_name])
+        .attr("y",function(d,i){
+          var y1 = stave_yValues[d.region_name]
+            , y2 = y1 - energyCredits_yScale(d.nEnergyCredits/d.returns)
+            return y2;})
         .attr("id",d => "stateText-state"+ d.STATEFIPS)
         .classed("state-text",true)
         .text(d=>d.STATE);

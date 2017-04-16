@@ -58,6 +58,8 @@
   opacity: 0;
   stroke: black;
   text-anchor: middle;
+  pointer-events: none;
+
 }
 
 /*MAP CSS*/
@@ -69,3 +71,17 @@
   opacity: 0.7;
 }
 
+.stars{
+  /*
+  stroke:white;
+  strok-width:0.05px;
+  */
+  fill:white;
+  pointer-events: none;
+  opacity:0;
+}
+.stars-background{
+  fill:black;
+  pointer-events: none;
+  opacity:0;
+}

@@ -398,7 +398,7 @@ function MusicalScore(){
                 , y2 = y1 - energyCredits_yScale(d.nEnergyCredits/d.returns)
                 , cy = stave_yValues[d.region_name]
                 , cx = notes_xScale( (d.aTaxLiability/d.aTotalIncome) )
-              linePoints.push([cx,cy])
+              linePoints.push([cx,y2])
               compValues[k] = d
             })
 

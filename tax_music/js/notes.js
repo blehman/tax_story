@@ -221,7 +221,12 @@ function MusicalScore(){
       // build voronoi
       var voronoi = d3.voronoi()
         .x(d => notes_xScale((d.aTaxLiability/d.aTotalIncome)) )
-        .y(d => stave_yValues[d.region_name])
+        //.y(d => stave_yValues[d.region_name])
+        .y(function(d,i){
+          var y1 = stave_yValues[d.region_name]
+            , y2 = y1 - energyCredits_yScale(d.nEnergyCredits/d.returns)
+            return y2;
+        })
         .extent([[-20,-40],[stave_length+20 , (stave_spacing * regions.length)]]);
 
       // draw voronoi polygons

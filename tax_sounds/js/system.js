@@ -200,31 +200,50 @@ function MusicalScore(){
           .attr("id", d => "stem-state"+d.STATEFIPS)
           .attr("class", "stem-"+region)
           .classed("stem",true)
-          .attr("d",function(d,i){
-            var x = rx + xScale(d.aTaxLiability/d.returns)
-            //var x = (notes_xScale((d.aTaxLiability/d.aTotalIncome)) +circle_radius)
-              , y1 = yScale(d.nEnergyCredits/d.returns)
-              , y2 = y1 - 20
-              //, y1 = stave_yValues[d.region_name]
-              //, y2 = y1 - energyCredits_yScale(d.nEnergyCredits/d.returns);
-            var linePath = "M "+ x + "," + y1 + "L" + x + "," + y2
-            return linePath;
-          })
+          .attr("d",buildStemPath)
           //.attr("cx", d => rx + xScale(d.aTaxLiability/d.returns))
           //.attr("cy",d=>yScale(d.nEnergyCredits/d.returns))
           //.attr("rx",rx)
           //.attr("ry",ry)
-          .attr("transform", d=>"translate (0,1.4) ")
+          .attr("transform", d=>"translate (0,1.4)")// rotate("+[-25,xScale(d.aTaxLiability/d.returns),yScale(d.nEnergyCredits/d.returns)].join(",")+")")
           //.style("fill",d=>district_color(d.district_name));
 
       // end regions.forEach
       })
+
+      function buildStemPath(d,i){
+        console.log(d)
+        district_direction = {}
+        district_direction["New England"] = -1
+        district_direction["Middle Atlantic"]=1
+        district_direction["East North Central"]=-1
+        district_direction["West North Central"]= 1
+        district_direction["South Atlantic"]=-1
+        district_direction["East South Central"]=1
+        district_direction["West South Central"]=1
+        district_direction["Mountain"] = 1
+        district_direction["Pacific"]=-1
+        var direction = district_direction[d.district_name]
+          , yAdj = direction==1? 2.7:0
+          , xAdj = direction==1? 5.4:0;
+
+        var x = xScale(d.aTaxLiability/d.returns)+xAdj
+        //var x = (notes_xScale((d.aTaxLiability/d.aTotalIncome)) +circle_radius)
+          , y1 = yScale(d.nEnergyCredits/d.returns) - yAdj
+          , y2 = y1 - (distance_between_staves*3*direction)
+          //, y1 = stave_yValues[d.region_name]
+          //, y2 = y1 - energyCredits_yScale(d.nEnergyCredits/d.returns);
+        var linePath = "M "+ x + "," + y1 + "L" + x + "," + y2
+        return linePath;
+      }
 
     // end selection.each
     })
 
   // end chart
   }
+
+
 
   chart.width = function(w) {
     if (!arguments.length) { return width; }

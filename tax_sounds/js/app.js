@@ -38,6 +38,8 @@
     }
     */
 
+    var music_dispatch = d3.dispatch("note-state--hover","note-state--out");
+
     //var regions = d3.map(state_array,d=>d.region_name).keys()
     var regions = ["Northeast","Midwest","South","West"]
         , districts = d3.map(state_array,d=>d.district_name).keys()
@@ -47,7 +49,6 @@
       ,"districts":districts
       ,"us":us
     }
-    console.log(data)
 
     // responsive svg: http://stackoverflow.com/questions/16265123/resize-svg-when-window-is-resized-in-d3-js#answer-25978286
     var svg = d3.select("body")
@@ -63,16 +64,16 @@
         .classed("svg-content-responsive", true)
         .attr("id","viz-container");
 
-
     // call the musical score constructor
     var iMusic = MusicalScore();
+    // update values in iMusic
+    iMusic.mDispatch(music_dispatch);
 
     svg.selectAll("#"+iMusic.id())
       .data([data])
      .enter().append("g")
       .attr('id',iMusic.id())
       .call(iMusic);
-
 
     // call the map constructor
     var iMap = Map();
@@ -83,6 +84,23 @@
       .attr('id',iMap.id())
       .call(iMap);
 
+    // call the interaction constructor
+    var iInteraction = Interaction();
+    // update values in iMusic
+    iInteraction.mDispatch = music_dispatch;
 
+    svg.selectAll("#"+iInteraction.id())
+      .data([data])
+     .enter().append("g")
+      .attr('id',iInteraction.id())
+      .call(iInteraction);
+
+    // manage dispatch calls
+    music_dispatch.on("note-state--hover",function(note){
+      iInteraction.noteStateHover()(note)
+    })
+    music_dispatch.on("note-state--out",function(note){
+      iInteraction.noteStateOut()(note)
+    })
   }
 }())

@@ -35,8 +35,6 @@ function Map(){
 
       var states = topojson.feature(us,us.objects.states).features;
 
-      console.log(states)
-
       states.map( d => d.properties["centroid"] = geoPath.centroid(d))
 
       var regionalMap = container.append("g")
@@ -130,7 +128,7 @@ function Map(){
                 , y_shift = regionShift[region][1]
               return "translate("+(d.properties.centroid[0]+x_shift)+","+(d.properties.centroid[1]+y_shift)+")";
             }});
-
+/*
       regionalMap.on("mouseover", function(d) {
         // select state map
         d3.select("#states-state"+d.id)
@@ -214,7 +212,7 @@ function Map(){
         d3.select(".arc").raise()
       })
 
-
+*/
 
 /*
       // define staves (regions) spacing

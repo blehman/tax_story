@@ -9,7 +9,7 @@ function MusicalScore(){
     , columns_per_measure = 12 // number of beats per measure
     , measures_per_line = 3 // number of columns per line
     , line_height = 30 // vertical distance of lines, which is a collection of the 5 staves
-    , distance_between_lines = 10 // separation between lines
+    , distance_between_lines = 15 // separation between lines
     , distance_between_staves = line_height/5
     , stave_xstart = 20
     , stave_ystart = 20
@@ -18,7 +18,10 @@ function MusicalScore(){
     , num_breaks = 3 // number of columns per line
     , rx = 3
     , ry = 2
-    , adj = 2; // make the notes appear on lines or between lines
+    , adj = 2
+    , rotation_angle = -25
+    , mDispatch;
+    // make the notes appear on lines or between lines
 
   function chart(selection){
     // the chart function builds the heatmap.
@@ -55,7 +58,6 @@ function MusicalScore(){
         , districts = data.districts
         , state_array = data.state_array
         , state_lookup = data.state_lookup;
-
       // define staves (regions) spacing
       //var stave_spacing = 40
       //  , stave_xstart = 50
@@ -143,7 +145,7 @@ function MusicalScore(){
         .attr("transform","translate("+stave_xstart+","+stave_ystart+")");
 
 
-      // for each region append 5 staves.
+      // for each region append 5 staves | append all of the notes for this region;
       regions.forEach(function(region,i){
         // create translation
         var translation = "translate(0,"+((i*distance_between_lines)+(i*line_height))+") ROTATE";
@@ -190,11 +192,17 @@ function MusicalScore(){
           .attr("cy",d=>yScale(d.nEnergyCredits/d.returns))
           .attr("rx",rx)
           .attr("ry",ry)
-          .attr("transform", d=>"translate (0,1.4) rotate("+[-25,xScale(d.aTaxLiability/d.returns),yScale(d.nEnergyCredits/d.returns)].join(",")+")")
+          .attr("transform", d=>"translate (0,1.4) rotate("+[rotation_angle,xScale(d.aTaxLiability/d.returns),yScale(d.nEnergyCredits/d.returns)].join(",")+")")
           .style("fill",d=>district_color(d.district_name));
 
+        notes.on("mouseover",function(d){
+          mDispatch.call("note-state--hover",this,d)
+        })
+        notes.on("mouseout",function(d){
+          mDispatch.call("note-state--out",this,d)
+        })
         // use state packing to append stems to a specific line
-        var notes = staves.selectAll(".notes-"+region)
+        var stems = staves.selectAll(".notes-"+region)
           .data(regional_states)
          .enter().append("path")
           .attr("id", d => "stem-state"+d.STATEFIPS)
@@ -212,7 +220,6 @@ function MusicalScore(){
       })
 
       function buildStemPath(d,i){
-        console.log(d)
         district_direction = {}
         district_direction["New England"] = -1
         district_direction["Middle Atlantic"]=1
@@ -243,8 +250,6 @@ function MusicalScore(){
   // end chart
   }
 
-
-
   chart.width = function(w) {
     if (!arguments.length) { return width; }
     width = w;
@@ -262,5 +267,12 @@ function MusicalScore(){
     id = i;
     return chart;
   };
+
+  chart.mDispatch = function(mD) {
+    if (!arguments.length) { return mDispatch; }
+    mDispatch = mD;
+    return chart;
+  };
+
   return chart
 }

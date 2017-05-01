@@ -5,7 +5,8 @@ function Map(){
     , height = 600
     , id = "us-map"
     , circle_radius = 4
-    , circle_radius_max = 15;
+    , circle_radius_max = 15
+    , mDispatch;
 
   // set projection
   var projection = d3.geoAlbersUsa()
@@ -33,10 +34,13 @@ function Map(){
       var district_color = d3.scaleOrdinal(d3.schemeCategory10)
         .domain(districts);
 
+      // get states geoJSON object
       var states = topojson.feature(us,us.objects.states).features;
 
+      // calculate the centroid of each state
       states.map( d => d.properties["centroid"] = geoPath.centroid(d))
 
+      // draw each state
       var regionalMap = container.append("g")
           .attr("id","map-container")
           .selectAll(".state")
@@ -67,8 +71,9 @@ function Map(){
         ,"South":[0,7]
         ,"West":[-7,0]
         }
-      // move region-West
-      d3.selectAll(".state")
+
+      // explode the map to regions
+      var statesObj = d3.selectAll(".state")
         .attr("transform",function(d){
           if (d.id == "72" || d.id == "69" || d.id == "60" || d.id == "78" || d.id == "66"){
               return;
@@ -79,6 +84,16 @@ function Map(){
             }
         });
 
+
+      statesObj.on("mouseover",function(d){
+        var result = {"STATEFIPS":d.properties.STATEFP}
+        mDispatch.call("note-state--hover",this,result)
+      })
+      statesObj.on("mouseout",function(d){
+        var result = {"STATEFIPS":d.properties.STATEFP}
+        mDispatch.call("note-state--out",this,result)
+      })
+      /*
       var centroidStarBackground = container.append("g")
           .classed("bstars-container",true)
           .selectAll(".stars-background")
@@ -128,117 +143,7 @@ function Map(){
                 , y_shift = regionShift[region][1]
               return "translate("+(d.properties.centroid[0]+x_shift)+","+(d.properties.centroid[1]+y_shift)+")";
             }});
-/*
-      regionalMap.on("mouseover", function(d) {
-        // select state map
-        d3.select("#states-state"+d.id)
-          .raise()
-          .transition()
-          .duration(200)
-          .style("stroke-width","2px")
-          .style("opacity",1.0);
-        // increase note radious
-        d3.select("#note-state" + d.id)
-          .raise()
-          .transition()
-          .duration(200)
-          .attr("r",circle_radius_max)
-          .style("stroke-width","2px")
-          .style("opacity",1);
-        // move and fill stem
-        d3.select("#stem-state"+ d.id)
-          .raise()
-          .transition()
-          .duration(200)
-          .style("opacity",1)
-          .style("stroke-width","2px")
-          .attr("transform","translate("+((circle_radius_max-circle_radius)+1)+",0)");
-        // move flag
-        d3.select("#flags-state"+ d.id)
-          .raise()
-          .transition()
-          .duration(200)
-          .style("stroke-width","2px")
-          .attr("transform","translate("+((circle_radius_max-circle_radius)+1)+",0)");
-        // only change opacity for selected notes
-        if (d3.select("#note-state"+d.id).attr("selected")==true){
-          d3.select("#flags-state" + d.id)
-          .style("opacity",1)
-        }
-        d3.select("#stateText-state"+ d.id)
-          .raise()
-          .transition()
-          .duration(200)
-          .style("opacity", 1)
-          .attr("transform","translate("+0+","+3.5+")");
-        d3.select(".arc").raise()
-      })
 
-      regionalMap.on("mouseout", function(d) {
-        // decrease note radius
-        d3.select("#note-state" + d.id)
-          .transition()
-          .duration(0)
-          .attr("r",circle_radius)
-          .style("stroke-width","0.50px");
-        // move stem
-        d3.select("#stem-state" + d.id)
-          .transition()
-          .duration(0)
-          .style("opacity",0.50)
-          .style("stroke-width","0.50px")
-          .attr("transform","translate(0,0)");
-        // move flag
-        d3.select("#flags-state" + d.id)
-          .transition()
-          .duration(0)
-          .style("stroke-width","0.50px")
-          .attr("transform","translate(0,0)");
-        if (d3.select("#note-state"+d.id).attr("selected")==true){
-          d3.select("#flags-state" + d.id)
-          .style("opacity",1)
-        }
-        d3.select("#stateText-state" + d.id)
-          .transition()
-          .duration(0)
-          .style("opacity", 0)
-        // select map
-        d3.select("#states-state"+d.id)
-          .transition()
-          .duration(0)
-          .style("stroke-width","0.5px")
-          .style("opacity",0.7)
-        // raise arc to always be on top
-        d3.select(".arc").raise()
-      })
-
-*/
-
-/*
-      // define staves (regions) spacing
-      var stave_spacing = 40
-        , stave_xstart = 20
-        , stave_ystart = 100
-        , stave_length = 500;
-
-      // create color scale by district
-      var district_color = d3.scaleOrdinal(d3.schemeCategory10)
-        .domain(regions);
-
-      // get extent for stems
-      var energyCreditsPerReturnsExtent = d3.extent(state_array,d => (d.nEnergyCredits/d.returns));
-      var energyCredits_yScale = d3.scaleLinear()
-        .domain(energyCreditsPerReturnsExtent)
-        .range([0,stave_spacing * stem_scale_factor])
-
-      // get extent for notes across x-axis
-      //var taxLiabilityPerLiableExtent = d3.extent(state_array,d => (d.aTaxLiability/d.aTotalIncome));
-      var taxLiabilityPerIncomeExtent = d3.extent(state_array,d => (d.aTaxLiability/d.aTotalIncome));
-      // define xScale for notes
-      var notes_xScale = d3.scaleLog()
-        .domain(taxLiabilityPerIncomeExtent)
-        .range([circle_radius,stave_length-circle_radius])
-*/
       function CalculateStarPoints(centerX, centerY, arms, outerRadius, innerRadius)
         {
           var results = "";
@@ -266,7 +171,7 @@ function Map(){
           }
           return results;
         }
-
+    */
     })
   }
 
@@ -287,5 +192,11 @@ function Map(){
     id = i;
     return chart;
   };
+  chart.mDispatch = function(mD) {
+    if (!arguments.length) { return mDispatch; }
+    mDispatch = mD;
+    return chart;
+  };
+
   return chart
 }

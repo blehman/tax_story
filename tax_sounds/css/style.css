@@ -27,6 +27,20 @@
     opacity:0.5;
     stroke-linecap: round;
 }
+
+/* SYSTEM CSS */
+
+.voronoi-polygons {
+  fill: red;
+  opacity: 0.0;
+  stroke: black;
+  stroke-width: 0.25;
+}
+
+
+
+/* MAP CSS */
+
 .state{
     stroke: #fff;
     stroke-width:0.25;
@@ -43,70 +57,5 @@
 .stars-background{
     opacity:0.0;
 }
-/*
-.note{
-    stroke: #000;
-    stroke-width: 0.25px;
-}
-.stem{
-    stroke: #000;
-    stroke-width: 0.50px;
-    opacity:0.5;
-    stroke-linecap: round;
-}
-.voronoi{
-  fill: none;
-  pointer-events: all;
-  stroke: red;
-  stroke-opacity:0.00;
-  stroke-width:0.25px;
-}
 
-.flags{
-    stroke: #000;
-    fill: none;
-    stroke-width: 0.50px;
-    opacity:0.0;
-    stroke-linecap: round;
-}
-.arc{
-    stroke: #000;
-    fill:none;
-    stroke-width: 0.50px;
-    opacity:0.5;
-    stroke-linecap: round;
-}
-.state-text{
-  font-size:12px;
-  opacity: 0;
-  stroke: black;
-  text-anchor: middle;
-  pointer-events: none;
 
-}
-
-*/
-
-/*MAP CSS*/
-
-/*
-.state{
-  fill:gray;
-  stroke: black;
-  stroke-width: 0.5px;
-  opacity: 0.7;
-}
-
-.stars{
-  stroke:white;
-  strok-width:0.05px;
-  fill:white;
-  pointer-events: none;
-  opacity:0;
-}
-.stars-background{
-  fill:black;
-  pointer-events: none;
-  opacity:0;
-}
-*/

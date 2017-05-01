@@ -77,6 +77,7 @@
 
     // call the map constructor
     var iMap = Map();
+    iMap.mDispatch(music_dispatch)
 
     svg.selectAll("#"+iMap.id())
       .data([data])

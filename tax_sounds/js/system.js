@@ -106,7 +106,6 @@ function MusicalScore(){
       //var staveIncrements = (energyCreditsPerReturnsExtent[1]-energyCreditsPerReturnsExtent[0]) / num_notes_per_line;
       //var staveLocations = rows.map(d => energyCreditsPerReturnsExtent[0]+(d*staveIncrements))
 
-      //console.log(taxLiabilityPerIncomeExtent)
 
       // y == energy credits per return
       var yScale = d3.scaleQuantize()
@@ -182,16 +181,28 @@ function MusicalScore(){
         })
 
         // use state packing to append notes to a specific line
-        var notes = staves.selectAll(".notes-"+region)
+        var notes = staves.selectAll(".note-"+region)
           .data(regional_states)
          .enter().append("ellipse")
           .attr("id", d => "note-state"+d.STATEFIPS)
           .attr("class", "note-"+region)
           .classed("note",true)
-          .attr("cx", d => rx + xScale(d.aTaxLiability/d.returns))
-          .attr("cy",d=>yScale(d.nEnergyCredits/d.returns))
-          .attr("rx",rx)
-          .attr("ry",ry)
+          .attr("cx", function(d){
+            d["cx"] = rx + xScale(d.aTaxLiability/d.returns)
+            return d.cx;
+          })
+          .attr("cy",function(d){
+            d["cy"] = yScale(d.nEnergyCredits/d.returns)
+            return d.cy;
+          })
+          .attr("rx",function(d){
+            d["rx"] = rx;
+            return rx
+          })
+          .attr("ry",function(d){
+            d["ry"] = ry;
+            return ry
+          })
           .attr("transform", d=>"translate (0,1.4) rotate("+[rotation_angle,xScale(d.aTaxLiability/d.returns),yScale(d.nEnergyCredits/d.returns)].join(",")+")")
           .style("fill",d=>district_color(d.district_name));
 
@@ -213,10 +224,41 @@ function MusicalScore(){
           //.attr("cy",d=>yScale(d.nEnergyCredits/d.returns))
           //.attr("rx",rx)
           //.attr("ry",ry)
-          .attr("transform", d=>"translate (0,1.4)")// rotate("+[-25,xScale(d.aTaxLiability/d.returns),yScale(d.nEnergyCredits/d.returns)].join(",")+")")
+          .attr("transform", "translate (0,1.4)")// rotate("+[-25,xScale(d.aTaxLiability/d.returns),yScale(d.nEnergyCredits/d.returns)].join(",")+")")
           //.style("fill",d=>district_color(d.district_name));
 
-      // end regions.forEach
+        // add voronoi to notes
+        var voronoi = d3.voronoi()
+          .x(d => d.cx)
+          .y(d => d.cy)
+          .extent([[-10,-10],[210,line_height]]);
+
+        var notes = d3.selectAll(".note-"+region).data();
+
+        var voronoi_polygons = staves.selectAll(".voronoi")
+          .data(voronoi.polygons(notes))
+         .enter().append("path")
+          .classed("voronoi-polygons",true)
+          .attr("d", function(d) {
+            //if (d.STATEFIPS == "72" || d.STATEFIPS == "69" || d.STATEFIPS == "60" || d.STATEFIPS == "78" || d.STATEFIPS == "66"){
+              //return;
+            //}else{
+              return d ? "M" + d.join("L") + "Z" : null;
+            //}
+          })
+          //.style("fill","red")
+          //.style("opacity",0.5)
+          //.style("stroke","black")
+          .attr("transform", "translate (0,1.4)")
+
+
+        voronoi_polygons.on("mouseover",function(d){
+          mDispatch.call("note-state--hover",this,d.data)
+        })
+        voronoi_polygons.on("mouseout",function(d){
+          mDispatch.call("note-state--out",this,d.data)
+        })
+        // end regions.forEach
       })
 
       function buildStemPath(d,i){
@@ -243,6 +285,7 @@ function MusicalScore(){
         var linePath = "M "+ x + "," + y1 + "L" + x + "," + y2
         return linePath;
       }
+
 
     // end selection.each
     })

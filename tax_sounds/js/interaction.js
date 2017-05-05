@@ -42,7 +42,11 @@ function Interaction(){
         , state_array = data.state_array
         , state_lookup = data.state_lookup;
 
+      console.log(state_lookup)
       noteStateHover = function(d){
+
+        var state_fips = d.STATEFIPS;
+        var region = state_lookup["state"+state_fips].region_name;
 
         // fade non selected states on map
         d3.selectAll(".state")
@@ -51,24 +55,27 @@ function Interaction(){
           .classed("state-hover",false)
 
         // apply different fade to hover region
-        d3.selectAll(".region-"+d.region_name)
+        d3.selectAll(".region-"+region)
           .classed("state-fade",false)
           .classed("state-hover-region",true)
 
         // change hover state css on map
-        d3.select("#states-state"+d.STATEFIPS)
+        d3.select("#states-state"+state_fips)
           .classed("state-hover-region",false)
           .classed("state-fade",false)
           .classed("state-hover",true)
 
         // change note class in system
-        d3.select("#note-state"+d.STATEFIPS)
+        d3.select("#note-state"+state_fips)
           .attr("rx", d => d.rx * 2)
           .attr("ry",d => d.ry * 2)
 
       }
 
       noteStateOut = function(d){
+        var state_fips = d.STATEFIPS;
+        var region = state_lookup["state"+state_fips].region_name;
+
         // remove fade states on map
         d3.selectAll(".state")
           .classed("state-neutral",true)
@@ -77,7 +84,7 @@ function Interaction(){
           .classed("state-hover-region",false)
 
         // change note class in system
-        d3.select("#note-state"+d.STATEFIPS)
+        d3.select("#note-state"+state_fips)
           .attr("rx",d => d.rx )
           .attr("ry",d => d.ry )
 

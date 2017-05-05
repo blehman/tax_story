@@ -52,9 +52,9 @@ function Map(){
             if (d.id == "72" || d.id == "69" || d.id == "60" || d.id == "78" || d.id == "66"){
               return;
             }else{
-              return "region-"+state_lookup["state"+d.id].region_name
+              return "state region-"+state_lookup["state"+d.id].region_name
             } })
-          .classed("state",true)
+          .classed("state-neutral",true)
           .attr("d",geoPath)
           .style("fill",function(d){
             if (d.id == "72" || d.id == "69" || d.id == "60" || d.id == "78" || d.id == "66"){

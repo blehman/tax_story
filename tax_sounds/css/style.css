@@ -37,20 +37,30 @@
   stroke-width: 0.25;
 }
 
-
-
 /* MAP CSS */
 
-.state{
+.state-neutral{
     stroke: #fff;
     stroke-width:0.25;
     opacity: 0.80;
 }
 .state-hover{
-    stroke: #444;
-    stroke-width:1px;
+    stroke: black;
+    stroke-width:0.50px;
     opacity:1;
 }
+
+.state-hover-region{
+    stroke: #fff;
+    stroke-width:0.25;
+    opacity:0.60;
+}
+.state-fade{
+    opacity:0.08;
+}
+
+
+/*
 .stars{
     opacity:0.0;
 }

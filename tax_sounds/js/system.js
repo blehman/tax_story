@@ -180,13 +180,23 @@ function MusicalScore(){
           }
         })
 
+        // use state packing to append stems to a specific line
+        var stems = staves.selectAll(".notes-"+region)
+          .data(regional_states)
+         .enter().append("path")
+          .attr("id", d => "stem-state"+d.STATEFIPS)
+          .attr("class", "stem-"+region)
+          .classed("stem",true)
+          .attr("d",buildStemPath)
+          .attr("transform", "translate (0,1.4)")// rotate("+[-25,xScale(d.aTaxLiability/d.returns),yScale(d.nEnergyCredits/d.returns)].join(",")+")")
+
         // use state packing to append notes to a specific line
         var notes = staves.selectAll(".note-"+region)
           .data(regional_states)
          .enter().append("ellipse")
           .attr("id", d => "note-state"+d.STATEFIPS)
-          .attr("class", "note-"+region)
-          .classed("note",true)
+          .attr("class", "note note-"+region)
+          .classed("note-neutral",true)
           .attr("cx", function(d){
             d["cx"] = rx + xScale(d.aTaxLiability/d.returns)
             return d.cx;
@@ -212,21 +222,6 @@ function MusicalScore(){
         notes.on("mouseout",function(d){
           mDispatch.call("note-state--out",this,d)
         })
-        // use state packing to append stems to a specific line
-        var stems = staves.selectAll(".notes-"+region)
-          .data(regional_states)
-         .enter().append("path")
-          .attr("id", d => "stem-state"+d.STATEFIPS)
-          .attr("class", "stem-"+region)
-          .classed("stem",true)
-          .attr("d",buildStemPath)
-          //.attr("cx", d => rx + xScale(d.aTaxLiability/d.returns))
-          //.attr("cy",d=>yScale(d.nEnergyCredits/d.returns))
-          //.attr("rx",rx)
-          //.attr("ry",ry)
-          .attr("transform", "translate (0,1.4)")// rotate("+[-25,xScale(d.aTaxLiability/d.returns),yScale(d.nEnergyCredits/d.returns)].join(",")+")")
-          //.style("fill",d=>district_color(d.district_name));
-
         // add voronoi to notes
         var voronoi = d3.voronoi()
           .x(d => d.cx)

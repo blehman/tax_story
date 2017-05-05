@@ -29,7 +29,6 @@
 }
 
 /* SYSTEM CSS */
-
 .voronoi-polygons {
   fill: red;
   opacity: 0.0;
@@ -37,8 +36,27 @@
   stroke-width: 0.25;
 }
 
-/* MAP CSS */
+.note-neutral{
+    stroke: black;
+    stroke-width:0.25;
+    opacity: 1;
+}
+.note-hover{
+    stroke: black;
+    stroke-width:0.50px;
+    opacity:1;
+}
 
+.note-hover-region{
+    stroke: black;
+    stroke-width:0.25;
+    opacity:0.80;
+}
+.note-fade{
+    opacity:0.35;
+}
+
+/* MAP CSS */
 .state-neutral{
     stroke: #fff;
     stroke-width:0.25;
@@ -51,12 +69,12 @@
 }
 
 .state-hover-region{
-    stroke: #fff;
+    stroke: black;
     stroke-width:0.25;
     opacity:0.60;
 }
 .state-fade{
-    opacity:0.08;
+    opacity:0.35;
 }
 
 

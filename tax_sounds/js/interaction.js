@@ -54,7 +54,7 @@ function Interaction(){
           .classed("state-fade",true)
           .classed("state-hover",false)
 
-        // apply different fade to hover region
+        // apply different fade to state hover region
         d3.selectAll(".region-"+region)
           .classed("state-fade",false)
           .classed("state-hover-region",true)
@@ -64,6 +64,23 @@ function Interaction(){
           .classed("state-hover-region",false)
           .classed("state-fade",false)
           .classed("state-hover",true)
+
+        // fade non selected notes in system
+        d3.selectAll(".note")
+          .classed("note-neutral",false)
+          .classed("note-fade",true)
+          .classed("note-hover",false)
+
+        // apply different fade to note hover region
+        d3.selectAll(".note-"+region)
+          .classed("note-fade",false)
+          .classed("note-hover-region",true)
+
+        // change hover note css in system
+        d3.select("#note-state"+state_fips)
+          .classed("note-hover-region",false)
+          .classed("note-fade",false)
+          .classed("note-hover",true)
 
         // change note class in system
         d3.select("#note-state"+state_fips)
@@ -82,6 +99,13 @@ function Interaction(){
           .classed("state-fade",false)
           .classed("state-hover",false)
           .classed("state-hover-region",false)
+
+        // remove fade notes in system
+        d3.selectAll(".note")
+          .classed("note-neutral",true)
+          .classed("note-fade",false)
+          .classed("note-hover",false)
+          .classed("note-hover-region",false)
 
         // change note class in system
         d3.select("#note-state"+state_fips)

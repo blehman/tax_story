@@ -40,7 +40,8 @@ function Interaction(){
       var regions = data.regions
         , districts = data.districts
         , state_array = data.state_array
-        , state_lookup = data.state_lookup;
+        , state_lookup = data.state_lookup
+        , district_direction = data.district_direction;
 
       console.log(state_lookup)
       noteStateHover = function(d){
@@ -68,8 +69,8 @@ function Interaction(){
         // fade non selected notes in system
         d3.selectAll(".note")
           .classed("note-neutral",false)
-          .classed("note-fade",true)
           .classed("note-hover",false)
+          .classed("note-fade",true)
 
         // apply different fade to note hover region
         d3.selectAll(".note-"+region)
@@ -78,14 +79,27 @@ function Interaction(){
 
         // change hover note css in system
         d3.select("#note-state"+state_fips)
+          .raise()
           .classed("note-hover-region",false)
           .classed("note-fade",false)
           .classed("note-hover",true)
 
         // change note class in system
         d3.select("#note-state"+state_fips)
+          .transition()
+          .duration(250)
           .attr("rx", d => d.rx * 2)
           .attr("ry",d => d.ry * 2)
+
+        // change stem css
+        var direction = district_direction[state_lookup["state"+state_fips].district_name];
+
+        d3.select("#stem-state"+state_fips)
+          .classed("stem",false)
+          .classed("stem-hover",true)
+          .transition()
+          .duration(250)
+          .attr("transform",d => "translate("+(direction*d.rx*0.91)+",0)")
 
       }
 
@@ -109,9 +123,24 @@ function Interaction(){
 
         // change note class in system
         d3.select("#note-state"+state_fips)
+          .transition()
+          .duration(250)
           .attr("rx",d => d.rx )
           .attr("ry",d => d.ry )
 
+        // change stem css
+        d3.select("#stem-state"+state_fips)
+          .classed("stem-hover",false)
+          .classed("stem",true)
+
+        //
+        var direction = district_direction[state_lookup["state"+state_fips].district_name];
+        d3.select("#stem-state"+state_fips)
+          .classed("stem-hover",false)
+          .classed("stem",true)
+          .transition()
+          .duration(250)
+          .attr("transform",d => "translate(0,1.4)")
       }
 
     // end selection.each

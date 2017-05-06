@@ -27,6 +27,12 @@
     opacity:0.5;
     stroke-linecap: round;
 }
+.stem-hover{
+    stroke: #000;
+    stroke-width: 0.50px;
+    opacity:1;
+    stroke-linecap: round;
+}
 
 /* SYSTEM CSS */
 .voronoi-polygons {
@@ -53,6 +59,7 @@
     opacity:0.80;
 }
 .note-fade{
+    stroke: none;
     opacity:0.35;
 }
 
@@ -74,6 +81,7 @@
     opacity:0.60;
 }
 .state-fade{
+    stroke:none;
     opacity:0.35;
 }
 

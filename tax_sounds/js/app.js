@@ -42,12 +42,25 @@
 
     //var regions = d3.map(state_array,d=>d.region_name).keys()
     var regions = ["Northeast","Midwest","South","West"]
-        , districts = d3.map(state_array,d=>d.district_name).keys()
+      , districts = d3.map(state_array,d=>d.district_name).keys()
+
+    var district_direction = {};
+    district_direction["New England"] = -1
+    district_direction["Middle Atlantic"]=1
+    district_direction["East North Central"]=-1
+    district_direction["West North Central"]= 1
+    district_direction["South Atlantic"]=-1
+    district_direction["East South Central"]=1
+    district_direction["West South Central"]=1
+    district_direction["Mountain"] = 1
+    district_direction["Pacific"]=-1
+
     var data = {"state_lookup":state_obj
       ,"state_array":state_array
       ,"regions":regions
       ,"districts":districts
       ,"us":us
+      ,"district_direction":district_direction
     }
 
     // responsive svg: http://stackoverflow.com/questions/16265123/resize-svg-when-window-is-resized-in-d3-js#answer-25978286

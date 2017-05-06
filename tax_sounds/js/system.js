@@ -57,7 +57,8 @@ function MusicalScore(){
       var regions = data.regions
         , districts = data.districts
         , state_array = data.state_array
-        , state_lookup = data.state_lookup;
+        , state_lookup = data.state_lookup
+        , district_direction = data.district_direction;
       // define staves (regions) spacing
       //var stave_spacing = 40
       //  , stave_xstart = 50
@@ -257,16 +258,7 @@ function MusicalScore(){
       })
 
       function buildStemPath(d,i){
-        district_direction = {}
-        district_direction["New England"] = -1
-        district_direction["Middle Atlantic"]=1
-        district_direction["East North Central"]=-1
-        district_direction["West North Central"]= 1
-        district_direction["South Atlantic"]=-1
-        district_direction["East South Central"]=1
-        district_direction["West South Central"]=1
-        district_direction["Mountain"] = 1
-        district_direction["Pacific"]=-1
+
         var direction = district_direction[d.district_name]
           , yAdj = direction==1? 2.7:0
           , xAdj = direction==1? 5.4:0;
